@@ -30,7 +30,6 @@ def converting_xls_to_xlsx(path:str):
     parh:str - путь к файлу кsонвертации"""
     x2x = XLS2XLSX(path)
     x2x.to_xlsx(path.replace(".xls", ".xlsx"))
-
 # converting_xls_to_xlsx(str(get_file_path(WORKING_FOLDER)["MAIN"]))
 
 def max_row_in_main_df(df)->int:
@@ -121,12 +120,12 @@ def creating_header(path:str):
 #  creating_header(get_file_path(WORKING_FOLDER))
 
 def adding_data_to_main(path):
-    zisu_data = getting_data(path)
     
+    zisu_data = getting_data(path)
     global len_zisu
     len_zisu = len(zisu_data)
-    
     abc = ("W", "X", "Y", "Z", "AA", "AB")
+    
     with open(path["FOR_WORK"], "rb") as main_xl:
         main_wb =  opxl.load_workbook(main_xl, read_only=False)   
         main_sheet = main_wb.active
@@ -164,9 +163,8 @@ def adding_data_to_main(path):
     
             formating_cell(main_sheet[f"{abc[-1]}{14+i}"], style="usual")
             i += 1
-        main_wb.save(path["FOR_WORK"])
-        
-#adding_data_to_main(get_file_path(WORKING_FOLDER))
+        main_wb.save(path["FOR_WORK"])      
+# adding_data_to_main(get_file_path(WORKING_FOLDER))
 
 def copy_header(workbook:opxl.Workbook, mode:str):
     sheet_to_copy = workbook["Лист1"]
@@ -177,7 +175,8 @@ def copy_header(workbook:opxl.Workbook, mode:str):
     else:
         new_sheet.title = mode
         workbook[mode].delete_rows(14,workbook[mode].max_row)
-    
+# copy_header(main_wb, "no_data")
+
 def no_data(path):
     with open(path["FOR_WORK"], "rb") as main_xl:
         main_wb =  opxl.load_workbook(main_xl, read_only=False)   
@@ -206,35 +205,8 @@ def no_data(path):
                             no_data_sheet.cell(row=r, column=1+i)._style = row[i]._style
                 r += 1
         main_wb.save(path["FOR_WORK"])        
-                
-def different(path):
-    with open(path["FOR_WORK"], "rb") as main_xl:
-        main_wb =  opxl.load_workbook(main_xl, read_only=False)   
-        main_sheet = main_wb["Лист1"]
-        global len_zisu
-        for row in main_sheet.iter_rows(min_row = 13, max_row = 13+len_zisu, min_col = 1, max_col=28):
-            if row[-2].value != "нет данных" and "Ярэнерго" in row[-7].value:
-                if row[-2].value not in main_wb.sheetnames:
-                    copy_header(main_wb, row[-2].value)
-                    diff_sheet = main_wb[str(row[-2].value)]
-                    max_row = diff_sheet.max_row+1
-                    for i in range(len(row)):
-                        diff_sheet.cell(row=max_row, column=1+i).value = row[i].value
-                        if row[i].has_style:
-                            diff_sheet.cell(row=max_row, column=1+i)._style = row[i]._style
-                else:
-                    diff_sheet = main_wb[row[-2].value]
-                    max_row = diff_sheet.max_row+1
-                    for i in range(len(row)):
-                        diff_sheet.cell(row=max_row, column=1+i).value = row[i].value
-                        if row[i].has_style:
-                            diff_sheet.cell(row=max_row, column=1+i)._style = row[i]._style
-        main_wb.save(path["FOR_WORK"]) 
-        
-    new_path = str(path["FOR_WORK"]).split("7-40")[0]+"7-40_ГОТОВО.xlsx"
-    os.rename(path["FOR_WORK"], new_path)
-
-
+     main_process(WORKING_FOLDER)            
+# no_data(WORKING_FOLDER)
 
 def main_process(path:str, dial, win):
     """Основная рабочая функция, которая запускается после нажатия кнопки""" 
@@ -249,4 +221,3 @@ def main_process(path:str, dial, win):
     except Exception as err:
         print(err)
 # main_process(WORKING_FOLDER)
-
